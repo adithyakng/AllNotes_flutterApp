@@ -99,13 +99,26 @@ class _ShowNotesState extends State<ShowNotes> {
     return SafeArea(
       child: Scaffold(
         body: fbuilder(),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.pink,
           onPressed: () {
             Navigator.pushNamed(context, "/addNotes",
                 arguments: {'refreshList': refreshList});
           },
           child: Icon(Icons.add),
+        ),
+        bottomNavigationBar: BottomAppBar(
+          color: Colors.white,
+          shape: CircularNotchedRectangle(),
+          child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            Icon(Icons.home,size: 40,color: Colors.pink,),
+            Icon(Icons.favorite,size: 40,color: Colors.pink,),
+          ],
+        ),
+        elevation: 20,
         ),
       ),
     );

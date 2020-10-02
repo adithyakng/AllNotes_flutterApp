@@ -94,7 +94,7 @@ class _AddNoteState extends State<AddNote> {
       child: Scaffold(
         appBar: AppBar(
           iconTheme: IconThemeData(
-            color: Colors.black, //Color of Back button
+            color: Colors.pink, //Color of Back button
           ),
           backgroundColor: Colors.white, // color of App bar
           title: TextField(
@@ -104,23 +104,27 @@ class _AddNoteState extends State<AddNote> {
             decoration: InputDecoration(border: InputBorder.none),
             style: TextStyle(
               fontSize: 25,
+              color: Colors.pink
             ),
           ),
         ),
         body: Card(
           child: Column(
             children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text("Date: " + date),
-                  Text("Time: " + time),
-                ],
+              Container(
+                height: 30,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text("Date: " + date),
+                    Text("Time: " + time),
+                  ],
+                ),
               ),
               Expanded(
                 child: Container(
                   padding: EdgeInsets.fromLTRB(20, 20, 20, 50),
-                  color: Colors.lightBlue[100],
+                  color: Colors.pink[100],
                   child: TextField(
                     controller: bodyFieldController,
                     autofocus: bodyFieldAutoFocus,
@@ -135,8 +139,9 @@ class _AddNoteState extends State<AddNote> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.white,
           onPressed: saveNote,
-          child: Icon(Icons.save),
+          child: Icon(Icons.save,color: Colors.pink,),
         ),
       ),
     );
