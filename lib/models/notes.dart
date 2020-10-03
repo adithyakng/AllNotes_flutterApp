@@ -4,8 +4,9 @@ class Notes {
   DateTime updatedOn;
   String title;
   String data;
+  int favourite;
 
-  Notes({this.id, this.createdOn, this.updatedOn, this.title, this.data});
+  Notes({this.id, this.createdOn, this.updatedOn, this.title, this.data,this.favourite = 0});
 
   Map<String, dynamic> toMap() {
     return {
@@ -14,6 +15,7 @@ class Notes {
       "data": data,
       "createdOn": createdOn.toIso8601String(),
       "updatedOn": updatedOn.toIso8601String(),
+      "favourite": favourite,
     };
   }
 
@@ -24,6 +26,12 @@ class Notes {
       data: note['data'],
       createdOn:  DateTime.parse(note['createdOn']),
       updatedOn:  DateTime.parse(note['updatedOn']),
+      favourite: note['favourite']
     );
+  }
+  
+  int toggleFavourite(){
+    this.favourite =  ~ this.favourite;  // change favourite
+    return this.favourite;
   }
 }

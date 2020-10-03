@@ -1,4 +1,5 @@
 import 'package:AllNote/databases/dbNotesHelper.dart';
+import 'package:AllNote/screens/favouritesScreen.dart';
 import 'package:AllNote/widgets/displayNoteWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,10 @@ class ShowNotes extends StatefulWidget {
 class _ShowNotesState extends State<ShowNotes> {
   Future<List<Notes>> notes;
   DbNotesHelper dbNotesHelper;
-  FutureBuilder fbuilder() {
+
+  bool mainScreen = true;
+
+  FutureBuilder homeBuilder() {
     return FutureBuilder(
         future: notes,
         builder: (context, snapshot) {
@@ -35,7 +39,8 @@ class _ShowNotesState extends State<ShowNotes> {
                     deleteWithNotification(snapshot.data[index]);
                   },
                   onDoubleTap: () {
-                    shareNote(snapshot.data[index]);
+                    // shareNote(snapshot.data[index]);
+                    changeFavourite(snapshot.data[index], context);
                   },
                   child: DisplayNote(
                     snapshot.data[index],
@@ -50,6 +55,14 @@ class _ShowNotesState extends State<ShowNotes> {
             );
           }
         });
+  }
+
+  changeFavourite(Notes note, BuildContext context) {
+    showMessage(
+        note.toggleFavourite() != 0
+            ? "Removed from favourites "
+            : "Added to Favourites",
+        context);
   }
 
   refreshList() {
@@ -84,7 +97,19 @@ class _ShowNotesState extends State<ShowNotes> {
   }
 
   shareNote(Notes note) {
-    Share.share(note.data,subject: note.title);
+    Share.share(note.data, subject: note.title);
+  }
+
+  void showMessage(String msg, BuildContext context) {
+    print("Here");
+    Scaffold.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        duration: Duration(
+          seconds: 1,
+        ),
+      ),
+    );
   }
 
   @override
@@ -98,7 +123,7 @@ class _ShowNotesState extends State<ShowNotes> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: fbuilder(),
+        body: mainScreen ? homeBuilder() : Favourites(),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.pink,
@@ -112,13 +137,34 @@ class _ShowNotesState extends State<ShowNotes> {
           color: Colors.white,
           shape: CircularNotchedRectangle(),
           child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            Icon(Icons.home,size: 40,color: Colors.pink,),
-            Icon(Icons.favorite,size: 40,color: Colors.pink,),
-          ],
-        ),
-        elevation: 20,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              IconButton(
+                  icon: Icon(
+                    Icons.home,
+                    size: 40,
+                    color: Colors.pink,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      mainScreen = true;
+                    });
+                  }),
+              IconButton(
+                icon: Icon(
+                  Icons.favorite,
+                  size: 40,
+                  color: Colors.pink,
+                ),
+                onPressed: () {
+                  setState(() {
+                    mainScreen = false;
+                  });
+                },
+              ),
+            ],
+          ),
+          elevation: 20,
         ),
       ),
     );

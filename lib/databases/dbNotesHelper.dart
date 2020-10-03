@@ -13,6 +13,7 @@ class DbNotesHelper extends ChangeNotifier {
   static const String UPDATED_ON = "updatedOn";
   static const String TITLE = "title";
   static const String DATA = "data";
+  static const String FAVOURITE = "favourite";
 
   Future<Database> get db async {
     if (_db != null) {
@@ -35,7 +36,8 @@ class DbNotesHelper extends ChangeNotifier {
         "title TEXT,"
         "data TEXT,"
         "createdOn TEXT,"
-        "updatedOn TEXT)");
+        "updatedOn TEXT,"
+        "favourite INTEGER)");
   }
 
   Future<int> insert(Notes note) async {
@@ -60,6 +62,11 @@ class DbNotesHelper extends ChangeNotifier {
   delete(Notes note) async{
     var database = await db;
     await database.delete(DB_NAME,where: "$ID = ?",whereArgs: [note.id.toIso8601String()]);
+  }
+
+  toggleFavourite(Notes note) async{
+    var database = await db;
+    await database.update(DB_NAME, note.toMap(),where: "$ID = ?",whereArgs: [note.id.toIso8601String()]);
   }
 
 }
