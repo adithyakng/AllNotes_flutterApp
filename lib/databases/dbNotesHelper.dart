@@ -50,7 +50,18 @@ class DbNotesHelper extends ChangeNotifier {
 
   Future<List<Notes>> getAllNotes() async {
     var database = await db;
-    List<Map<String, dynamic>> list = await database.query(DB_NAME);
+    List<Map<String, dynamic>> list = await database.query(DB_NAME,);
+    List<Notes> notesList =new List<Notes>();
+    list.forEach((element) {
+      print(element);
+      notesList.add(Notes.fromMap(element));
+    });
+    return notesList;
+  }
+
+   Future<List<Notes>> getAllFavouriteNotes({int favourites = 1}) async {
+    var database = await db;
+    List<Map<String, dynamic>> list = await database.query(DB_NAME, where: "$FAVOURITE = ?", whereArgs: [favourites]);
     List<Notes> notesList =new List<Notes>();
     list.forEach((element) {
       print(element);
@@ -66,7 +77,9 @@ class DbNotesHelper extends ChangeNotifier {
 
   toggleFavourite(Notes note) async{
     var database = await db;
+    note.toggleFavourite();
     await database.update(DB_NAME, note.toMap(),where: "$ID = ?",whereArgs: [note.id.toIso8601String()]);
+    return note.favourite;
   }
 
 }

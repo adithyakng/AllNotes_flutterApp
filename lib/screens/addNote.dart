@@ -18,6 +18,7 @@ class _AddNoteState extends State<AddNote> {
   bool titleAutoFocus = false;
   bool bodyFieldAutoFocus = true;
   Map<String, dynamic> arguments;
+  int isFavouriteScreen = 0;
   @override
   void initState() {
     super.initState();
@@ -52,6 +53,7 @@ class _AddNoteState extends State<AddNote> {
       titleController.text = note.title;
       bodyFieldController.text = note.data;
     }
+    
   }
 
   void saveNote() {
@@ -76,16 +78,19 @@ class _AddNoteState extends State<AddNote> {
           ));
       return;
     }
+    isFavouriteScreen = arguments['mainScreen'] ? 0 : 1 ;
     Notes save = new Notes(
       id: currentDateTime,
       updatedOn: currentDateTime,
       createdOn: currentDateTime,
       title: titleController.text,
-      data: bodyFieldController.text
+      data: bodyFieldController.text,
+      favourite: isFavouriteScreen
+     
     );
     dbHelper.insert(save);
     refreshList();
-    Navigator.pop(context);
+    Navigator.pop(context,isFavouriteScreen);
   }
 
   @override

@@ -1,5 +1,4 @@
 import 'package:AllNote/databases/dbNotesHelper.dart';
-import 'package:AllNote/screens/favouritesScreen.dart';
 import 'package:AllNote/widgets/displayNoteWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,27 +12,31 @@ class ShowNotes extends StatefulWidget {
 }
 
 class _ShowNotesState extends State<ShowNotes> {
-  Future<List<Notes>> notes;
+  Future<List<Notes>> allnotes;
   DbNotesHelper dbNotesHelper;
 
   bool mainScreen = true;
 
   FutureBuilder homeBuilder() {
     return FutureBuilder(
-        future: notes,
+        future: allnotes,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data.length == 0) {
               return Center(
-                child: Text('Click on + to add a Note'),
+                child: mainScreen
+                    ? Text('Click on + to add a Note')
+                    : Text("Double click on card to make it favourite"),
               );
             }
             return ListView.builder(
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
-                    Navigator.pushNamed(context, "/addNotes",
-                        arguments: {'note': snapshot.data[index]});
+                    Navigator.pushNamed(context, "/addNotes", arguments: {
+                      'note': snapshot.data[index],
+                      'mainScreen': mainScreen
+                    });
                   },
                   onLongPress: () {
                     deleteWithNotification(snapshot.data[index]);
@@ -57,17 +60,21 @@ class _ShowNotesState extends State<ShowNotes> {
         });
   }
 
-  changeFavourite(Notes note, BuildContext context) {
-    showMessage(
-        note.toggleFavourite() != 0
-            ? "Removed from favourites "
-            : "Added to Favourites",
-        context);
+  changeFavourite(Notes note, BuildContext context) async {
+    var k = await dbNotesHelper.toggleFavourite(note);
+    k == 1
+        ? showMessage("Added to Favourites", context)
+        : showMessage("Removed from Favourites", context);
+    if (!mainScreen) {
+      setState(() {
+        allnotes = dbNotesHelper.getAllFavouriteNotes();
+      });
+    }
   }
 
   refreshList() {
     setState(() {
-      notes = dbNotesHelper.getAllNotes();
+      allnotes = dbNotesHelper.getAllNotes();
     });
   }
 
@@ -101,7 +108,6 @@ class _ShowNotesState extends State<ShowNotes> {
   }
 
   void showMessage(String msg, BuildContext context) {
-    print("Here");
     Scaffold.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
@@ -123,13 +129,22 @@ class _ShowNotesState extends State<ShowNotes> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: mainScreen ? homeBuilder() : Favourites(),
+        body: homeBuilder(),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.pink,
-          onPressed: () {
-            Navigator.pushNamed(context, "/addNotes",
-                arguments: {'refreshList': refreshList});
+          onPressed: () async{
+            dynamic result = await Navigator.pushNamed(context, "/addNotes", arguments: {
+              'refreshList': refreshList,
+              'mainScreen': mainScreen
+            });
+            if(result.toInt() == 1){
+              setState(() {
+                mainScreen = false;
+                allnotes = dbNotesHelper.getAllFavouriteNotes();
+              });
+            }
+
           },
           child: Icon(Icons.add),
         ),
@@ -148,6 +163,7 @@ class _ShowNotesState extends State<ShowNotes> {
                   onPressed: () {
                     setState(() {
                       mainScreen = true;
+                      allnotes = dbNotesHelper.getAllNotes();
                     });
                   }),
               IconButton(
@@ -159,6 +175,8 @@ class _ShowNotesState extends State<ShowNotes> {
                 onPressed: () {
                   setState(() {
                     mainScreen = false;
+                    allnotes =
+                        dbNotesHelper.getAllFavouriteNotes(favourites: 1);
                   });
                 },
               ),

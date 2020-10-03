@@ -30,8 +30,8 @@ class Notes {
     );
   }
   
-  int toggleFavourite(){
-    this.favourite =  ~ this.favourite;  // change favourite
-    return this.favourite;
+  Notes toggleFavourite(){
+    this.favourite =  this.favourite == 1 ? 0 : 1 ;  // change favourite
+    return this;
   }
 }
